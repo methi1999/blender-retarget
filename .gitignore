@@ -1,0 +1,15 @@
+.idea/
+data
+__pycache__/
+output/
+doc/assets
+
+*.blend
+*.mp4
+*.pickle
+*.zip
+*.gif
+*.fbx
+
+/blender/add-ons/rokoko-custom/packages/
+/blender/add-ons/rokoko-custom/resources/libs

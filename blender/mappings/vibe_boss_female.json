@@ -1,0 +1,183 @@
+{
+    "rokoko_custom_names": true,
+    "version": 1,
+    "bones": {
+        "custom_bone_f_avg_r_ankle": [
+            "f_avg_r_ankle",
+            "boss:rightfoot"
+        ],
+        "custom_bone_f_avg_spine3": [
+            "f_avg_spine3",
+            "boss:spine2"
+        ],
+        "custom_bone_f_avg_spine1": [
+            "f_avg_spine1",
+            "boss:spine"
+        ],
+        "custom_bone_f_avg_r_hip": [
+            "f_avg_r_hip",
+            "boss:rightupleg"
+        ],
+        "custom_bone_f_avg_l_ankle": [
+            "f_avg_l_ankle",
+            "boss:leftfoot"
+        ],
+        "custom_bone_f_avg_head": [
+            "f_avg_head",
+            "boss:head"
+        ],
+        "custom_bone_f_avg_pelvis": [
+            "f_avg_pelvis",
+            "boss:hips"
+        ],
+        "custom_bone_f_avg_l_hip": [
+            "f_avg_l_hip",
+            "boss:leftupleg"
+        ],
+        "custom_bone_f_avg_spine2": [
+            "f_avg_spine2",
+            "boss:spine1"
+        ],
+        "custom_bone_f_avg_l_wrist": [
+            "f_avg_l_wrist",
+            "boss:lefthand"
+        ],
+        "custom_bone_f_avg_r_wrist": [
+            "f_avg_r_wrist",
+            "boss:righthand"
+        ],
+        "custom_bone_f_avg_r_shoulder": [
+            "f_avg_r_shoulder",
+            "boss:rightarm"
+        ],
+        "custom_bone_f_avg_l_shoulder": [
+            "f_avg_l_shoulder",
+            "boss:leftarm"
+        ],
+        "custom_bone_f_avg_neck": [
+            "f_avg_neck",
+            "boss:neck"
+        ],
+        "custom_bone_f_avg_l_elbow": [
+            "f_avg_l_elbow",
+            "boss:leftforearm"
+        ],
+        "custom_bone_f_avg_l_collar": [
+            "f_avg_l_collar",
+            "boss:leftshoulder"
+        ],
+        "custom_bone_f_avg_r_collar": [
+            "f_avg_r_collar",
+            "boss:rightshoulder"
+        ],
+        "custom_bone_f_avg_r_elbow": [
+            "f_avg_r_elbow",
+            "boss:rightforearm"
+        ],
+        "custom_bone_f_avg_r_knee": [
+            "f_avg_r_knee",
+            "boss:rightleg"
+        ],
+        "custom_bone_f_avg_l_knee": [
+            "f_avg_l_knee",
+            "boss:leftleg"
+        ],
+        "custom_bone_f_avg_r_ankle": [
+            "f_avg_r_ankle",
+            "boss:rightfoot"
+        ],
+        "custom_bone_f_avg_spine3": [
+            "f_avg_spine3",
+            "boss:spine2"
+        ],
+        "custom_bone_f_avg_spine1": [
+            "f_avg_spine1",
+            "boss:spine"
+        ],
+        "custom_bone_f_avg_r_hip": [
+            "f_avg_r_hip",
+            "boss:rightupleg"
+        ],
+        "custom_bone_f_avg_l_ankle": [
+            "f_avg_l_ankle",
+            "boss:leftfoot"
+        ],
+        "custom_bone_f_avg_head": [
+            "f_avg_head",
+            "boss:head"
+        ],
+        "custom_bone_f_avg_pelvis": [
+            "f_avg_pelvis",
+            "boss:hips"
+        ],
+        "custom_bone_f_avg_l_hip": [
+            "f_avg_l_hip",
+            "boss:leftupleg"
+        ],
+        "custom_bone_f_avg_spine2": [
+            "f_avg_spine2",
+            "boss:spine1"
+        ],
+        "custom_bone_f_avg_l_wrist": [
+            "f_avg_l_wrist",
+            "boss:lefthand"
+        ],
+        "custom_bone_f_avg_r_wrist": [
+            "f_avg_r_wrist",
+            "boss:righthand"
+        ],
+        "custom_bone_f_avg_r_shoulder": [
+            "f_avg_r_shoulder",
+            "boss:rightarm"
+        ],
+        "custom_bone_f_avg_l_shoulder": [
+            "f_avg_l_shoulder",
+            "boss:leftarm"
+        ],
+        "custom_bone_f_avg_neck": [
+            "f_avg_neck",
+            "boss:neck"
+        ],
+        "custom_bone_f_avg_l_elbow": [
+            "f_avg_l_elbow",
+            "boss:leftforearm"
+        ],
+        "custom_bone_f_avg_l_collar": [
+            "f_avg_l_collar",
+            "boss:leftshoulder"
+        ],
+        "custom_bone_f_avg_r_collar": [
+            "f_avg_r_collar",
+            "boss:rightshoulder"
+        ],
+        "custom_bone_f_avg_r_elbow": [
+            "f_avg_r_elbow",
+            "boss:rightforearm"
+        ],
+        "custom_bone_f_avg_r_knee": [
+            "f_avg_r_knee",
+            "boss:rightleg"
+        ],
+        "custom_bone_f_avg_l_knee": [
+            "f_avg_l_knee",
+            "boss:leftleg"
+        ],
+        "custom_bone_f_avg_l_foot": [
+            "f_avg_l_foot",
+            "boss:lefttoe_end"
+        ],
+        "custom_bone_f_avg_r_foot": [
+            "f_avg_r_foot",
+            "boss:righttoe_end"
+        ],
+        "custom_bone_f_avg_l_hand": [
+            "f_avg_l_hand",
+            "boss:lefthandmiddle1"
+        ],
+        "custom_bone_f_avg_r_hand": [
+            "f_avg_r_hand",
+            "boss:righthandmiddle1"
+        ]
+    },
+    "shapes": {}
+}
