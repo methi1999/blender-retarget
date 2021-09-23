@@ -149,7 +149,7 @@ class ColourBones(bpy.types.Operator):
         if event.type == 'ESC':
             # empty list
             ColourBones.bone_groups = []
-            print("Exiting hierarchy mode")
+            print("Exiting colour mode")
             return {'FINISHED'}
         elif event.type == 'P':
             if bpy.context.selected_pose_bones is not None:
@@ -173,10 +173,6 @@ class ColourBones(bpy.types.Operator):
 
                     source_hier = {source_root.name: recursive_build(source_root, {})}
                     bones_source = graph_match.get_nodes_in_path(source_hier, first, second)
-                    if bones_source is None:
-                        bones_source = graph_match.get_nodes_in_path(source_hier, second, first)
-                        if bones_source is None:
-                            raise Exception("No path found in source hierarchy")
 
                     retargeted_dict = {}
                     for bone_item in context.scene.rsl_retargeting_bone_list:
@@ -185,6 +181,7 @@ class ColourBones(bpy.types.Operator):
                                     retargeted_dict[x] is not None and len(retargeted_dict[x])]
                     # colour
                     colors = [(random.random(), random.random(), random.random()) for _ in range(len(bones_source))]
+                    cur_names = []
                     # color source
                     for i, (s, t) in enumerate(zip(bones_source, bones_target)):
                         color = colors[i]
@@ -194,11 +191,14 @@ class ColourBones(bpy.types.Operator):
                         index = len(groups) - 1
 
                         groups[index].name = s + '::' + t
+                        cur_names.append(s + '::' + t)
                         groups[index].colors.active = color
                         groups[index].colors.normal = color
                         groups[index].colors.select = color
                         groups[index].color_set = "CUSTOM"
                         pose.bones[s].bone_group_index = index
+
+                    ColourBones.bone_groups.append(cur_names)
 
                     # go back to object mode
                     bpy.ops.object.posemode_toggle()
@@ -225,6 +225,18 @@ class ColourBones(bpy.types.Operator):
                     bpy.data.objects[source_arm.name].hide_set(False)
                     bpy.data.objects[target_arm.name].select_set(True)
                     bpy.ops.object.posemode_toggle()
+        elif event.type == 'U':
+            print("Removing colour groups")
+            source_arm, target_arm = get_source_armature().name, get_target_armature().name
+            for n in ColourBones.bone_groups[-1]:
+                try:
+                    bpy.data.objects[source_arm].pose.bone_groups.remove(bpy.data.objects[source_arm].pose.bone_groups[n])
+                    bpy.data.objects[target_arm].pose.bone_groups.remove(bpy.data.objects[target_arm].pose.bone_groups[n])
+                except:
+                    print("Some error")
+                    pass
+            if len(ColourBones.bone_groups):
+                del ColourBones.bone_groups[-1]
 
         return {'PASS_THROUGH'}
 

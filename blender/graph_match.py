@@ -7,7 +7,7 @@ from copy import deepcopy
 np.random.seed(7)
 
 
-def graph_from_dict(nested_dict):
+def graph_from_dict(nested_dict, undirected=False):
     # Empty directed graph
     G = nx.DiGraph()
 
@@ -17,6 +17,8 @@ def graph_from_dict(nested_dict):
         v, d = q.pop()
         for nv, nd in d.items():
             G.add_edge(v, nv)
+            if undirected:
+                G.add_edge(nv, v)
             if isinstance(nd, dict):
                 q.append((nv, nd))
 
@@ -45,14 +47,17 @@ def delete_sub_dict(key, entire_d):
 
 
 def get_nodes_in_path(d, start, end):
-    G = graph_from_dict(d)
+    G = graph_from_dict(d, undirected=True)
     pth = list(nx.all_simple_paths(G, source=start, target=end))
-    if len(pth) >= 1:
-        assert len(pth) == 1
+    if len(pth) == 1:
         return pth[0]
-    else:
-        # in case first and second are reversed
-        return None
+    elif len(pth) == 0:
+        pth = list(nx.all_simple_paths(G, source=end, target=start))
+        if len(pth) == 0:
+            raise Exception("No path exists")
+        else:
+            return pth[0]
+
 
 
 def best_matching(s, t):
@@ -291,7 +296,7 @@ if __name__ == '__main__':
     b_l_arm, b_r_arm = 'boss:LeftArm', 'boss:RightArm'
     b_l_leg, b_r_leg = 'boss:LeftLeg', 'boss:RightLeg'
 
-    get_nodes_in_path(a, 'f_avg_Pelvis', 'f_avg_L_Wrist')
+    get_nodes_in_path(a, 'f_avg_R_Hip', 'f_avg_L_Wrist')
 
     # arms testing
     # retarget(get_sub_dict(a_l_arm, a), get_sub_dict(b_l_arm, b))
