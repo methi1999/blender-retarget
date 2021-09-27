@@ -26,6 +26,19 @@ if "bpy" in locals():
 RETARGET_ID = '_RSL_RETARGET'
 
 
+def recursive_build(node, names):
+    """
+    Build a dictionary rooted at node from armature children list
+    @param node: root node
+    @param names: dictionary to which results are appended
+    @return: dictionary with node and its children
+    """
+    names[node.name] = {}
+    for child in node.children.keys():
+        names[node.name][child] = recursive_build(node.children[child], names)
+    return names[node.name]
+
+
 class BuildBoneList(bpy.types.Operator):
     """
     Adds rows to the interface and maps bones according to retargeting dict
@@ -65,11 +78,12 @@ class BuildBoneList(bpy.types.Operator):
         return {'FINISHED'}
 
 
-# FirstGuess
+# Graph matching of source and target
 class ExtractHierarchy(bpy.types.Operator):
     bl_label = "Extract hierarchy"
     bl_idname = "wm.extract_hierarchy"
     bl_options = {'REGISTER'}
+    # stores the 4 key bones: source root, source up, tagret root, target up
     key_bones = []
 
     def draw(self, context):
@@ -87,7 +101,7 @@ class ExtractHierarchy(bpy.types.Operator):
                 print("Select exactly 1 bone at a time")
             else:
                 bone = bpy.context.selected_pose_bones[-1].name
-                # accidentally registers 3 presses
+                # accidentally registers > 1 presses and hence add bone only if prveiously not added
                 if len(ExtractHierarchy.key_bones) == 0 or ExtractHierarchy.key_bones[-1] != bone:
                     ExtractHierarchy.key_bones.append(bone)
                     print(ExtractHierarchy.key_bones)
@@ -99,13 +113,7 @@ class ExtractHierarchy(bpy.types.Operator):
                     target_root = bpy.data.armatures[target_arm.name].bones[
                         bpy.data.armatures[target_arm.name].bones[0].name]
                     print("Detected Source root: {}, Target root: {}".format(source_root.name, target_root.name))
-
-                    def recursive_build(node, names):
-                        names[node.name] = {}
-                        for child in node.children.keys():
-                            names[node.name][child] = recursive_build(node.children[child], names)
-                        return names[node.name]
-
+                    # build armature dictionary
                     source_hier = {source_root.name: recursive_build(source_root, {})}
                     target_hier = {target_root.name: recursive_build(target_root, {})}
                     print("Source hierarchy", source_hier, '\n\n\n', 'Target hierarchy', target_hier)
@@ -113,12 +121,11 @@ class ExtractHierarchy(bpy.types.Operator):
                     best_mapping = graph_match.retarget_root_up(source_hier, target_hier, ExtractHierarchy.key_bones)
                     # arm/leg split
                     # best_mapping = graph_match.retarget_arms_legs(source_hier, target_hier, ExtractHierarchy.key_bones)
-                    # set mapping
+                    # set mapping in row selector
                     print("Best mapping:", best_mapping)
                     for bone_item in context.scene.rsl_retargeting_bone_list:
                         if bone_item.bone_name_source in best_mapping:
                             bone_item.bone_name_target = best_mapping[bone_item.bone_name_source]
-
                     # empty list
                     ExtractHierarchy.key_bones = []
 
@@ -134,11 +141,16 @@ class ExtractHierarchy(bpy.types.Operator):
         return {'FINISHED'}
 
 
-# Colour
 class ColourBones(bpy.types.Operator):
+    """
+    Colouring of bones
+    Press button to enter mode
+    Choose 2 bones in source armature and hit P to colour them
+    """
     bl_label = "Colour bones"
     bl_idname = "wm.colour_bones"
     bl_options = {'REGISTER'}
+    # bone groups stores currently added groups so that deletion becomes easier
     bone_groups = []
 
     def draw(self, context):
@@ -158,28 +170,23 @@ class ColourBones(bpy.types.Operator):
                 else:
                     # get 2 bones
                     first, second = bpy.context.selected_pose_bones[-1].name, bpy.context.selected_pose_bones[-2].name
+                    # build armature dictionary
                     source_arm, target_arm = get_source_armature(), get_target_armature()
                     source_root = bpy.data.armatures[source_arm.name].bones[
                         bpy.data.armatures[source_arm.name].bones[0].name]
                     target_root = bpy.data.armatures[target_arm.name].bones[
                         bpy.data.armatures[target_arm.name].bones[0].name]
                     print("Detected Source root: {}, Target root: {}".format(source_root.name, target_root.name))
-
-                    def recursive_build(node, names):
-                        names[node.name] = {}
-                        for child in node.children.keys():
-                            names[node.name][child] = recursive_build(node.children[child], names)
-                        return names[node.name]
-
                     source_hier = {source_root.name: recursive_build(source_root, {})}
+                    # get path of nodes in source dictionary
                     bones_source = graph_match.get_nodes_in_path(source_hier, first, second)
-
+                    # get corresponding target armature bones from retargeted list
                     retargeted_dict = {}
                     for bone_item in context.scene.rsl_retargeting_bone_list:
                         retargeted_dict[bone_item.bone_name_source] = bone_item.bone_name_target
                     bones_target = [retargeted_dict[x] for x in bones_source if
                                     retargeted_dict[x] is not None and len(retargeted_dict[x])]
-                    # colour
+                    # generate colours
                     colors = [(random.random(), random.random(), random.random()) for _ in range(len(bones_source))]
                     cur_names = []
                     # color source
@@ -199,7 +206,6 @@ class ColourBones(bpy.types.Operator):
                         pose.bones[s].bone_group_index = index
 
                     ColourBones.bone_groups.append(cur_names)
-
                     # go back to object mode
                     bpy.ops.object.posemode_toggle()
                     bpy.data.objects[source_arm.name].hide_set(True)
@@ -250,7 +256,12 @@ class ColourBones(bpy.types.Operator):
 
 
 class ManualBoneMapper(bpy.types.Operator):
-    """Process input while Control key is pressed."""
+    """
+    Manually map two bones for fine-tuning
+    Press button to enter mode
+    Choose the 2 bones (1 from source and 1 from target)
+    Hit U to map them
+    """
     bl_idname = 'custom.map_bones'
     bl_label = 'Enter manual mapping'
     bl_description = "On entering, choose source bone followed by target bone and press U. Exit mode using Esc"

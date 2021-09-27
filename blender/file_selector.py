@@ -75,6 +75,7 @@ class OpenFilebrowser(Operator, ImportHelper):
         return {'FINISHED'}
 
 
+# gender chooser class
 class GenderChooser(bpy.types.Operator):
     bl_label = "Choose gender"
     bl_idname = "wm.template_operator"
@@ -109,7 +110,7 @@ class LayoutDemoPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         scene = context.scene
-        # gender picker button
+        # Gender picker button
         layout.operator("wm.template_operator")
         # Input video button
         layout.label(text="Input video")

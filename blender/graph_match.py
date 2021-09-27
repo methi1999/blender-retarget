@@ -8,6 +8,12 @@ np.random.seed(7)
 
 
 def graph_from_dict(nested_dict, undirected=False):
+    """
+    Convert nested dictionary to a networkx graph object
+    @param nested_dict: {b1: {b2: {}, b3:{}} -> simple 3 node graph
+    @param undirected: whether graph is undirected
+    @return:
+    """
     # Empty directed graph
     G = nx.DiGraph()
 
@@ -26,7 +32,12 @@ def graph_from_dict(nested_dict, undirected=False):
 
 
 def get_sub_dict(key, entire_d):
-    # extract subparts of skeleton hierarchy
+    """
+    Extract subparts of skeleton hierarchy
+    @param key: key to extract
+    @param entire_d: original dictionary
+    @return: if d = {a: {b: {c}, d: {}}} and key = b, return {b: {c}}
+    """
     q = list(entire_d.items())
     while q:
         v, d = q.pop()
@@ -38,7 +49,12 @@ def get_sub_dict(key, entire_d):
 
 
 def delete_sub_dict(key, entire_d):
-
+    """
+    Delete a sub dictionary of key = key from entire dictionary
+    @param key: to delete
+    @param entire_d: original dictionary
+    @return: None, in place deletion
+    """
     if key in entire_d:
         del entire_d[key]
     for value in entire_d.values():
@@ -47,11 +63,19 @@ def delete_sub_dict(key, entire_d):
 
 
 def get_nodes_in_path(d, start, end):
+    """
+    Get list of nodes in path; mianly used for coloring the bones
+    @param d: nested dictionary for constructing graph
+    @param start: start node
+    @param end: end node
+    @return: list of nodes [start, n1, n2, ..., end]
+    """
     G = graph_from_dict(d, undirected=True)
     pth = list(nx.all_simple_paths(G, source=start, target=end))
     if len(pth) == 1:
         return pth[0]
     elif len(pth) == 0:
+        # try reverse path since graph could be directed
         pth = list(nx.all_simple_paths(G, source=end, target=start))
         if len(pth) == 0:
             raise Exception("No path exists")
@@ -59,14 +83,19 @@ def get_nodes_in_path(d, start, end):
             return pth[0]
 
 
-
 def best_matching(s, t):
+    """
+    Main function which generates best guess
+    @param s: source dict
+    @param t: target dict
+    @return: {source_bone_1: best_target_guess_1, ... }
+    """
     # build graphs
     source_g, target_g = graph_from_dict(s), graph_from_dict(t)
     # draw_graph([source_g, target_g])
     # transform target (G1) to source (G2)
     paths = nx.optimize_edit_paths(source_g, target_g, timeout=120)
-    # find min cost result
+    # find min cost result since paths will be a list of predictions
     min_nodes, min_cost = None, np.inf
     for n, e, c in paths:
         if c < min_cost:
@@ -130,6 +159,12 @@ def retarget_arms_legs(source_dict, target_dict, arm_leg_mapping=None):
 
 
 def resolve_left_right(d):
+    """
+    Resolves left-right errors after matching
+    e.g. if 'L.Wrist' is mapped to 'right_Hand1', return {'L.Wrist': 'left_Hand1'}
+    @param d: best mapping
+    @return: resolved
+    """
     l_r = {'_l': '_r', '.l': '.r', '_L': '_R', '.L': '.R', 'left': 'right', 'Left': 'Right'}
     for source, target in d.items():
         is_left, is_right = False, False
@@ -161,6 +196,13 @@ def resolve_left_right(d):
 
 
 def retarget_root_up(source_dict, target_dict, root_up):
+    """
+    Given root and up bones for source and target armature, split the graph and run edit distance matching
+    @param source_dict:
+    @param target_dict:
+    @param root_up: [source root, source up, target root, target up]
+    @return: best matching dict: {source_bone_1: best_target_bone1, ... }
+    """
     source_root_name, source_up_name, target_root_name, target_up_name = root_up
     # make source up and down dicts
     source_up = {source_up_name: get_sub_dict(source_up_name, source_dict)}
@@ -179,10 +221,11 @@ def retarget_root_up(source_dict, target_dict, root_up):
         target_down = target_down['f_avg_root']
     elif 'm_avg_root' in target_down:
         target_down = target_down['m_avg_root']
-
+    # run graph matching separately
     up_match = best_matching(source_up, target_up)
     down_match = best_matching(source_down, target_down)
     final = {}
+    # get best mapping
     for sbone, tbone in up_match + down_match:
         if sbone is not None and tbone is not None:
             final[sbone] = tbone
@@ -191,6 +234,13 @@ def retarget_root_up(source_dict, target_dict, root_up):
 
 
 def iterative(s, t):
+    """
+    Iterative procedure from paper "Automatically Mapping Human Skeletons onto Virtual Character Armatures by Sanna"
+    Very poor results
+    @param s: source dict
+    @param t: target dict
+    @return: best matching
+    """
     g1, g2 = graph_from_dict(s), graph_from_dict(t)
     # draw_graph(g1)
     g1_nodes, g2_nodes = list(g1.nodes()), list(g2.nodes())
