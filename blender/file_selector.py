@@ -89,7 +89,7 @@ class GenderChooser(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        layout.prop(self, "gender_enums")
+        layout.prop(self, "gender_enums", expand=True)
 
     def execute(self, context):
         global gender_global

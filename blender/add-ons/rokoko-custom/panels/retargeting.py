@@ -63,13 +63,16 @@ class RetargetingPanel(ToolPanel, bpy.types.Panel):
         row = layout.row(align=True)
         row.template_list("RSL_UL_BoneList", "Bone List", context.scene, "rsl_retargeting_bone_list", context.scene, "rsl_retargeting_bone_list_index", rows=1, maxrows=10)
 
-        # first pass
+        # graph matching button
         layout.operator(retargeting.ExtractHierarchy.bl_idname)
 
         # manual bone mapper using keyboard
         layout.operator(retargeting.ManualBoneMapper.bl_idname)
 
-        # Bone colour
+        # colour scheme
+        layout.operator(retargeting.ColorSchemePicker.bl_idname)
+
+        # bone colour
         layout.operator(retargeting.ColourBones.bl_idname)
 
         row = layout.row(align=True)

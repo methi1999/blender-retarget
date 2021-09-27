@@ -24,6 +24,7 @@ if "bpy" in locals():
         importlib.reload(graph_match)
 
 RETARGET_ID = '_RSL_RETARGET'
+color_scheme_global = 'random'
 
 
 def recursive_build(node, names):
@@ -141,6 +142,29 @@ class ExtractHierarchy(bpy.types.Operator):
         return {'FINISHED'}
 
 
+# Color Scheme Picker
+class ColorSchemePicker(bpy.types.Operator):
+    bl_label = "Choose color scheme"
+    bl_idname = "custom.color_scheme"
+    color_enums: bpy.props.EnumProperty(items=[('random', 'Random', 'Random colors'),
+                                               ('gradient', 'Gradient', 'Gradient')],
+                                        name="Color scheme")
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)
+
+    def draw(self, context):
+        layout = self.layout
+        layout.prop(self, "color_enums", expand=True)
+
+    def execute(self, context):
+        global color_scheme_global
+        color_scheme_global = self.color_enums
+        print("Set color scheme to {}".format(color_scheme_global))
+        return {'FINISHED'}
+
+
 class ColourBones(bpy.types.Operator):
     """
     Colouring of bones
@@ -187,7 +211,7 @@ class ColourBones(bpy.types.Operator):
                     bones_target = [retargeted_dict[x] for x in bones_source if
                                     retargeted_dict[x] is not None and len(retargeted_dict[x])]
                     # generate colours
-                    colors = [(random.random(), random.random(), random.random()) for _ in range(len(bones_source))]
+                    colors = graph_match.get_colors(color_scheme_global, len(bones_source))
                     cur_names = []
                     # color source
                     for i, (s, t) in enumerate(zip(bones_source, bones_target)):
@@ -236,8 +260,10 @@ class ColourBones(bpy.types.Operator):
             source_arm, target_arm = get_source_armature().name, get_target_armature().name
             for n in ColourBones.bone_groups[-1]:
                 try:
-                    bpy.data.objects[source_arm].pose.bone_groups.remove(bpy.data.objects[source_arm].pose.bone_groups[n])
-                    bpy.data.objects[target_arm].pose.bone_groups.remove(bpy.data.objects[target_arm].pose.bone_groups[n])
+                    bpy.data.objects[source_arm].pose.bone_groups.remove(
+                        bpy.data.objects[source_arm].pose.bone_groups[n])
+                    bpy.data.objects[target_arm].pose.bone_groups.remove(
+                        bpy.data.objects[target_arm].pose.bone_groups[n])
                 except:
                     print("Some error")
                     pass

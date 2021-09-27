@@ -87,6 +87,7 @@ classes = [  # These non-panels will always be loaded, all non-panel ui should g
     operators.retargeting.ManualBoneMapper,
     operators.retargeting.ExtractHierarchy,
     operators.retargeting.ColourBones,
+    operators.retargeting.ColorSchemePicker,
     panels.retargeting.RSL_UL_BoneList,
     panels.retargeting.BoneListItem,
     # operators.info.LicenseButton,

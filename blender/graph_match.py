@@ -3,8 +3,42 @@ import numpy as np
 import matplotlib.pyplot as plt
 from networkx.drawing.nx_pydot import graphviz_layout
 from copy import deepcopy
+import random
 
 np.random.seed(7)
+random.seed(7)
+
+
+def get_colors(scheme, n):
+    """
+    Get colors for n bones
+    @param scheme: random or gradient
+    @param n: number of bones to color
+    @return: list of rgb colots
+    """
+    if scheme.lower() == 'random':
+        return [(random.random(), random.random(), random.random()) for _ in range(n)]
+    elif scheme.lower() == 'gradient':
+        s = np.random.random(3)*0.5
+        f = np.random.random(3)*0.5 + 0.5
+        # s = [0, 0, 0]
+        # f = [0, 0, 1]
+        # print(s, f)
+        # Initialise a list of the output colors with the starting color
+        rgb_list = [s]
+        # Calculate a color at each evenly spaced value of t from 1 to n
+        for t in range(1, n):
+            # Interpolate RGB vector for color at the current value of t
+            curr_vector = [s[j] + (float(t) / (n - 1)) * (f[j] - s[j]) for j in range(3)]
+            # Add it to our list of output colors
+            rgb_list.append(curr_vector)
+        # print(rgb_list)
+        for i, c in enumerate(rgb_list):
+            plt.scatter(i, i, color=c)
+        plt.show()
+        return rgb_list
+    else:
+        raise Exception("Color scheme not yet implemented")
 
 
 def graph_from_dict(nested_dict, undirected=False):
